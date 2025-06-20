@@ -1,7 +1,13 @@
-scripts/
-_build/
-_static/
-_templates/
-htmlcov/
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 
-*.pyc
+# Virtual environment
+venv/
+env/
+
+# Editor and OS files
+*.swp
+.DS_Store
+Thumbs.db

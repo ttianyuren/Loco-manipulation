@@ -82,16 +82,20 @@ if __name__ == "__main__":
             position_cost=1.0,
             orientation_cost=1.0,
         ),
-        l_ee_task := mink.FrameTask(
+        l_ee_task := mink.RelativeFrameTask(
             frame_name="left_gripper",
             frame_type="site",
+            root_name="base_link",
+            root_type="body",
             position_cost=1.0,
             orientation_cost=1.0,
             lm_damping=1.0,
         ),
-        r_ee_task := mink.FrameTask(
+        r_ee_task := mink.RelativeFrameTask(
             frame_name="right_gripper",
             frame_type="site",
+            root_name="base_link",
+            root_type="body",
             position_cost=1.0,
             orientation_cost=1.0,
             lm_damping=1.0,

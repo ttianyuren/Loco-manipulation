@@ -28,3 +28,7 @@ python3 examples/tiago_dual.py
 ## Keyboard Control
 
 Keyboard-based control of the end effector is currently implemented using the [keyboard module](https://github.com/kevinzakka/mink/tree/main/mink/contrib/keyboard_teleop) from Mink. The key mappings can be found in the corresponding [KEYBOARD.md](https://github.com/kevinzakka/mink/blob/main/mink/contrib/keyboard_teleop/KEYBOARD.md) file.
+
+## Robot Model
+
+The MuJoCo model for the dual-arm Tiago robot is taken from the [mujoco_menagerie](https://github.com/google-deepmind/mujoco_menagerie/tree/main/pal_tiago_dual) repository.

@@ -103,27 +103,21 @@ if __name__ == "__main__":
         posture_task := mink.PostureTask(model, cost=1e-1),
     ]
 
-    # Enable collision avoidance between the following geoms.
-    # l_wrist_geoms = mink.get_subtree_geom_ids(model, model.body("left/wrist_link").id)
-    # r_wrist_geoms = mink.get_subtree_geom_ids(model, model.body("right/wrist_link").id)
-    # l_geoms = mink.get_subtree_geom_ids(model, model.body("left/upper_arm_link").id)
-    # r_geoms = mink.get_subtree_geom_ids(model, model.body("right/upper_arm_link").id)
-    # frame_geoms = mink.get_body_geom_ids(model, model.body("metal_frame").id)
-    # collision_pairs = [
-    #     (l_wrist_geoms, r_wrist_geoms),
-    #     (l_geoms + r_geoms, frame_geoms + ["table"]),
-    # ]
-    # collision_avoidance_limit = mink.CollisionAvoidanceLimit(
-    #     model=model,
-    #     geom_pairs=collision_pairs,  # type: ignore
-    #     minimum_distance_from_collisions=0.05,
-    #     collision_detection_distance=0.1,
-    # )
+    collision_pairs = [
+        (["finger_left_1", "finger_left_2"], ["tabletop"]),
+    ]   
+    
+    collision_avoidance_limit = mink.CollisionAvoidanceLimit(
+        model=model,
+        geom_pairs=collision_pairs,
+        minimum_distance_from_collisions=0.1,
+        collision_detection_distance=0.15,
+    )
 
     limits = [
         mink.ConfigurationLimit(model=model),
         mink.VelocityLimit(model, velocity_limits),
-        # collision_avoidance_limit,
+        collision_avoidance_limit,
     ]
 
     base_mid = model.body("base_target").mocapid[0]

@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional, Sequence
 
 import mujoco
 import mujoco.viewer
@@ -35,40 +34,9 @@ CONTROLLED_JOINTS_AND_LIMITS = [
 CONTROLLED_JOINT_NAMES = [name for name, _ in CONTROLLED_JOINTS_AND_LIMITS]
 VEL_LIMITS = dict(CONTROLLED_JOINTS_AND_LIMITS)
 
-
-def compensate_gravity(
-    model: mujoco.MjModel,
-    data: mujoco.MjData,
-    subtree_ids: Sequence[int],
-    qfrc_applied: Optional[np.ndarray] = None,
-) -> None:
-    """Compute forces to counteract gravity for the given subtrees.
-
-    Args:
-        model: Mujoco model.
-        data: Mujoco data.
-        subtree_ids: List of subtree ids. A subtree is defined as the kinematic tree
-            starting at the body and including all its descendants. Gravity
-            compensation forces will be applied to all bodies in the subtree.
-        qfrc_applied: Optional array to store the computed forces. If not provided,
-            the applied forces in `data` are used.
-    """
-    qfrc_applied = data.qfrc_applied if qfrc_applied is None else qfrc_applied
-    qfrc_applied[:] = 0.0  # Don't accumulate from previous calls.
-    jac = np.empty((3, model.nv))
-    for subtree_id in subtree_ids:
-        total_mass = model.body_subtreemass[subtree_id]
-        mujoco.mj_jacSubtreeCom(model, data, jac, subtree_id)
-        qfrc_applied[:] -= model.opt.gravity * total_mass @ jac
-
-
 if __name__ == "__main__":
     model = mujoco.MjModel.from_xml_path(str(_XML))
     data = mujoco.MjData(model)
-
-    # Bodies for which to apply gravity compensation.
-    lift_subtree_id = model.body("torso_lift_link").id
-
 
     dof_ids = np.array([model.joint(name).id for name in CONTROLLED_JOINT_NAMES])
     actuator_ids = np.array(
@@ -197,7 +165,6 @@ if __name__ == "__main__":
                     break
 
             data.ctrl[actuator_ids] = configuration.q[dof_ids]
-            compensate_gravity(model, data, [lift_subtree_id])
             mujoco.mj_step(model, data)
 
             mujoco.mj_fwdPosition(model, data)

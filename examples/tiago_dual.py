@@ -23,8 +23,14 @@ ARM_JOINT_NAMES = [
 ]
 
 CONTROLLED_JOINTS_AND_LIMITS = [
-    *[(f"arm_left_{n}", l) for n, l in zip(ARM_JOINT_NAMES, [1.95, 1.95, 2.35, 2.35, 1.95, 1.76, 1.76])],
-    *[(f"arm_right_{n}", l) for n, l in zip(ARM_JOINT_NAMES, [1.95, 1.95, 2.35, 2.35, 1.95, 1.76, 1.76])],
+    *[
+        (f"arm_left_{n}", l)
+        for n, l in zip(ARM_JOINT_NAMES, [1.95, 1.95, 2.35, 2.35, 1.95, 1.76, 1.76])
+    ],
+    *[
+        (f"arm_right_{n}", l)
+        for n, l in zip(ARM_JOINT_NAMES, [1.95, 1.95, 2.35, 2.35, 1.95, 1.76, 1.76])
+    ],
     ("torso_lift_joint", 0.07),
     ("base_x", 0.5),
     ("base_y", 0.5),
@@ -119,8 +125,12 @@ if __name__ == "__main__":
         assert base_task.transform_target_to_world is not None
 
         # Initialize mocap targets at the end-effector site.
-        mink.move_mocap_to_frame(model, data, "left_gripper_target", "left_gripper", "site")
-        mink.move_mocap_to_frame(model, data, "right_gripper_target", "right_gripper", "site")
+        mink.move_mocap_to_frame(
+            model, data, "left_gripper_target", "left_gripper", "site"
+        )
+        mink.move_mocap_to_frame(
+            model, data, "right_gripper_target", "right_gripper", "site"
+        )
 
         rate = RateLimiter(frequency=200.0, warn=False)
         while viewer.is_running():
@@ -168,7 +178,7 @@ if __name__ == "__main__":
             mujoco.mj_step(model, data)
 
             mujoco.mj_fwdPosition(model, data)
-            mujoco.mj_sensorPos(model, data)
+            mujoco.mj_sensorPos(model, data)# Update the viewer with the new data.
 
             # Visualize at fixed FPS.
             viewer.sync()

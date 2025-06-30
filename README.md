@@ -32,3 +32,11 @@ Keyboard-based control of the end effector is currently implemented using the [k
 ## Robot Model
 
 The MuJoCo model for the dual-arm Tiago robot is taken from the [mujoco_menagerie](https://github.com/google-deepmind/mujoco_menagerie/tree/main/pal_tiago_dual) repository.
+
+## Code Formatting
+
+We use [Ruff](https://github.com/astral-sh/ruff) for code formatting. To format, run:
+
+```bash
+ruff format [file]
+```

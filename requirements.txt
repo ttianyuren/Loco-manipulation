@@ -1,1 +1,2 @@
 mink[examples]==0.0.11
+ruff==0.12.1

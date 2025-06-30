@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional, Sequence
+from typing import Optional, Sequence
 
 import mujoco
 import mujoco.viewer
@@ -12,8 +12,8 @@ from mink.contrib import TeleopMocap
 _HERE = Path(__file__).parent
 _XML = _HERE / "pal_tiago_dual" / "scene.xml"
 
-# Single arm joint names.
-_JOINT_NAMES = [
+# Combined joint names and velocity limits for all controlled joints
+ARM_JOINT_NAMES = [
     "1_joint",
     "2_joint",
     "3_joint",
@@ -23,9 +23,17 @@ _JOINT_NAMES = [
     "7_joint",
 ]
 
-# Single arm velocity limits, taken from:
-# https://github.com/Interbotix/interbotix_ros_manipulators/blob/main/interbotix_ros_xsarms/interbotix_xsarm_descriptions/urdf/vx300s.urdf.xacro
-_VELOCITY_LIMITS = {k: np.pi for k in _JOINT_NAMES}
+CONTROLLED_JOINTS_AND_LIMITS = [
+    *[(f"arm_left_{n}", l) for n, l in zip(ARM_JOINT_NAMES, [1.95, 1.95, 2.35, 2.35, 1.95, 1.76, 1.76])],
+    *[(f"arm_right_{n}", l) for n, l in zip(ARM_JOINT_NAMES, [1.95, 1.95, 2.35, 2.35, 1.95, 1.76, 1.76])],
+    ("torso_lift_joint", 0.07),
+    ("base_x", 0.5),
+    ("base_y", 0.5),
+    ("base_th", 0.5),
+]
+
+CONTROLLED_JOINT_NAMES = [name for name, _ in CONTROLLED_JOINTS_AND_LIMITS]
+VEL_LIMITS = dict(CONTROLLED_JOINTS_AND_LIMITS)
 
 
 def compensate_gravity(
@@ -61,17 +69,11 @@ if __name__ == "__main__":
     # Bodies for which to apply gravity compensation.
     lift_subtree_id = model.body("torso_lift_link").id
 
-    # Get the dof and actuator ids for the joints we wish to control.
-    joint_names: List[str] = []
-    velocity_limits: dict[str, float] = {}
-    for prefix in ["left", "right"]:
-        for n in _JOINT_NAMES:
-            name = f"arm_{prefix}_{n}"
-            joint_names.append(name)
-            velocity_limits[name] = _VELOCITY_LIMITS[n]
-    joint_names.extend(["base_x","base_y","base_th","torso_lift_joint"])
-    dof_ids = np.array([model.joint(name).id for name in joint_names])
-    actuator_ids = np.array([model.actuator(f"{name}_position").id for name in joint_names])
+
+    dof_ids = np.array([model.joint(name).id for name in CONTROLLED_JOINT_NAMES])
+    actuator_ids = np.array(
+        [model.actuator(f"{name}_position").id for name in CONTROLLED_JOINT_NAMES]
+    )
 
     configuration = mink.Configuration(model)
 
@@ -116,7 +118,7 @@ if __name__ == "__main__":
 
     limits = [
         mink.ConfigurationLimit(model=model),
-        mink.VelocityLimit(model, velocity_limits),
+        mink.VelocityLimit(model, velocities=VEL_LIMITS),
         collision_avoidance_limit,
     ]
 

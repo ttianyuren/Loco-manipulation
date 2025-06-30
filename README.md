@@ -22,7 +22,7 @@ pip install -r requirements.txt
 Run the teleoperation example with:
 
 ```bash
-python3 examples/tiago_dual.py
+python3 tiago_dual.py
 ```
 
 ## Keyboard Control

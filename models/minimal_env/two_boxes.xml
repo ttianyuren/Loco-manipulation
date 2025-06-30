@@ -16,4 +16,8 @@
   <visual>
     <map znear="0.01"/>
   </visual>
+
+  <sensor>
+    <fromto geom1="box1" geom2="box2" cutoff="1"/>
+  </sensor>
 </mujoco>

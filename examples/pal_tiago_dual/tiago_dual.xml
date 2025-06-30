@@ -140,13 +140,13 @@
                         <inertial pos="0.008658 0.019724 -0.149125" mass="0.107001" diaginertia="0.000242 0.000236 0.000018"/>
                         <joint name="gripper_left_right_finger_joint" axis="1 0 0" type="slide" range="0 0.045"
                           damping="1"/>
-                        <geom quat="4.63268e-05 0 0 1" material="black" mesh="gripper_right_finger_link"/>
+                        <geom name="finger_left_1" quat="4.63268e-05 0 0 1" material="black" mesh="gripper_right_finger_link"/>
                       </body>
                       <body name="gripper_left_left_finger_link" pos="0 0 -0.076575" quat="1 0 0 -1">
                         <inertial pos="-0.008658 -0.019724 -0.149125" mass="0.107001" diaginertia="0.000242 0.000236 0.000018"/>
                         <joint name="gripper_left_left_finger_joint" axis="-1 0 0" type="slide" range="0 0.045"
                           damping="1"/>
-                        <geom quat="4.63268e-05 0 0 1" material="black" mesh="gripper_left_finger_link"/>
+                        <geom name="finger_left_2" quat="4.63268e-05 0 0 1" material="black" mesh="gripper_left_finger_link"/>
                       </body>
                     </body>
                   </body>
@@ -191,13 +191,13 @@
                         <inertial pos="0.008658 0.019724 -0.149125" mass="0.107001" diaginertia="0.000242 0.000236 0.000018"/>
                         <joint name="gripper_right_right_finger_joint" axis="1 0 0" type="slide" range="0 0.045"
                           damping="1"/>
-                        <geom quat="4.63268e-05 0 0 1" material="black" mesh="gripper_right_finger_link"/>
+                        <geom name="finger_right_1" quat="4.63268e-05 0 0 1" material="black" mesh="gripper_right_finger_link"/>
                       </body>
                       <body name="gripper_right_left_finger_link" pos="0 0 0.076575" quat="0 -1 1 0">
                         <inertial pos="-0.008658 -0.019724 -0.149125" mass="0.107001" diaginertia="0.000242 0.000236 0.000018"/>
                         <joint name="gripper_right_left_finger_joint" axis="-1 0 0" type="slide" range="0 0.045"
                           damping="1"/>
-                        <geom quat="4.63268e-05 0 0 1" material="black" mesh="gripper_left_finger_link"/>
+                        <geom name="finger_right_2" quat="4.63268e-05 0 0 1" material="black" mesh="gripper_left_finger_link"/>
                       </body>
                     </body>
                   </body>

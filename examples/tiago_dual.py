@@ -204,6 +204,9 @@ if __name__ == "__main__":
             compensate_gravity(model, data, [lift_subtree_id])
             mujoco.mj_step(model, data)
 
+            mujoco.mj_fwdPosition(model, data)
+            mujoco.mj_sensorPos(model, data)
+
             # Visualize at fixed FPS.
             viewer.sync()
             rate.sleep()

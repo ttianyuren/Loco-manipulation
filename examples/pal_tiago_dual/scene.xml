@@ -16,7 +16,7 @@
 
   <worldbody>
     <body name="table" pos="0.7 0 0" quat="0.7071 0 0 0.7071">
-      <geom type="box" size="0.5625 0.375 0.01" pos="0 0 0.66" rgba="0.35 0.35 0.35 1"/>
+      <geom name="tabletop" type="box" size="0.5625 0.375 0.01" pos="0 0 0.66" rgba="0.35 0.35 0.35 1"/>
       <geom type="box" size="0.01875 0.01875 0.325" pos=" 0.525  0.3375 0.325" rgba="0.3 0.3 0.3 1" mass="2"/>
       <geom type="box" size="0.01875 0.01875 0.325" pos="-0.525  0.3375 0.325" rgba="0.3 0.3 0.3 1" mass="2"/>
       <geom type="box" size="0.01875 0.01875 0.325" pos=" 0.525 -0.3375 0.325" rgba="0.3 0.3 0.3 1" mass="2"/>
@@ -46,6 +46,13 @@
     0.9 -0.9 1.4 1.6 0 0 0 0 0
     0.9 -0.9 1.4 1.6 0 0 0 0 0"/>
   </keyframe>
+
+
+
+  <sensor>
+    <fromto geom1="finger_left_1" geom2="tabletop" cutoff="1"/>
+    <fromto geom1="finger_left_2" geom2="tabletop" cutoff="1"/>
+  </sensor>
 
 </mujoco>
 

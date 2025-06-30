@@ -1,0 +1,19 @@
+<mujoco model="two_boxes">
+  <compiler angle="degree" coordinate="local" />
+
+  <worldbody>
+    <!-- First box at origin -->
+    <body name="box1" pos="0 0 0.05">
+      <geom name="box1" type="box" size="0.05 0.05 0.05" rgba="1 0 0 1"/>
+    </body>
+
+    <!-- Second box 20cm (0.2m) apart along x-axis -->
+    <body name="box2" pos="0.2 0 0.05">
+      <geom name="box2" type="box" size="0.05 0.05 0.05" rgba="0 0 1 1"/>
+    </body>
+  </worldbody>
+
+  <visual>
+    <map znear="0.01"/>
+  </visual>
+</mujoco>

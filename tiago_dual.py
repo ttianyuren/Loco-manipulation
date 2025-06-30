@@ -9,7 +9,7 @@ import mink
 from mink.contrib import TeleopMocap
 
 _HERE = Path(__file__).parent
-_XML = _HERE / "models" / "pal_tiago_dual" / "scene.xml"
+_XML = _HERE / "models" / "pal_tiago_dual" / "tiago_scene.xml"
 
 # Combined joint names and velocity limits for all controlled joints
 ARM_JOINT_NAMES = [

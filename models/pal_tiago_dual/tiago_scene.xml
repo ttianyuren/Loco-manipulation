@@ -58,8 +58,7 @@
   </keyframe>
 
   <sensor>
-    <fromto geom1="finger_left_1" geom2="tabletop" cutoff="1"/>
-    <fromto geom1="finger_left_2" geom2="tabletop" cutoff="1"/>
+    <fromto geom1="gripper_left_right_finger_collision" geom2="tabletop" cutoff="1"/>
   </sensor>
 
 </mujoco>

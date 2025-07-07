@@ -80,9 +80,9 @@ if __name__ == "__main__":
     ]
 
     collision_pairs = [
-        (["finger_left_1", "finger_left_2"], ["tabletop"]),
-    ]   
-    
+        (["gripper_left_right_finger_collision"], ["tabletop"]),
+    ]
+
     collision_avoidance_limit = mink.CollisionAvoidanceLimit(
         model=model,
         geom_pairs=collision_pairs,

@@ -1,11 +1,11 @@
 from pathlib import Path
 
+from utils import configuration_reached
+import mink
 import mujoco
 import mujoco.viewer
 import numpy as np
 from loop_rate_limiters import RateLimiter
-
-import mink
 from mink.contrib import TeleopMocap
 
 _HERE = Path(__file__).parent
@@ -40,8 +40,10 @@ CONTROLLED_JOINTS_AND_LIMITS = [
 CONTROLLED_JOINT_NAMES = [name for name, _ in CONTROLLED_JOINTS_AND_LIMITS]
 VEL_LIMITS = dict(CONTROLLED_JOINTS_AND_LIMITS)
 
+MAX_ITERS = 10  # max iterations to solve IK per step
+
 if __name__ == "__main__":
-    model = mujoco.MjModel.from_xml_path(str(_XML))
+    model = mujoco.MjModel.from_xml_path(_XML.as_posix())
     data = mujoco.MjData(model)
 
     dof_ids = np.array([model.joint(name).id for name in CONTROLLED_JOINT_NAMES])
@@ -96,15 +98,6 @@ if __name__ == "__main__":
         collision_avoidance_limit,
     ]
 
-    base_mid = model.body("base_target").mocapid[0]
-    l_mid = model.body("left_gripper_target").mocapid[0]
-    r_mid = model.body("right_gripper_target").mocapid[0]
-    solver = "daqp"
-    pos_threshold = 5e-3
-    ori_threshold = 5e-3
-    max_iters = 5
-
-    # Initialize key_callback function.
     key_callback = TeleopMocap(data)
 
     with mujoco.viewer.launch_passive(
@@ -116,15 +109,13 @@ if __name__ == "__main__":
     ) as viewer:
         mujoco.mjv_defaultFreeCamera(model, viewer.cam)
 
-        # Initialize to the home keyframe.
         mujoco.mj_resetDataKeyframe(model, data, model.key("neutral_pose").id)
         configuration.update(data.qpos)
         mujoco.mj_forward(model, data)
+
         posture_task.set_target_from_configuration(configuration)
         base_task.set_target_from_configuration(configuration)
-        assert base_task.transform_target_to_world is not None
 
-        # Initialize mocap targets at the end-effector site.
         mink.move_mocap_to_frame(
             model, data, "left_gripper_target", "left_gripper", "site"
         )
@@ -134,52 +125,37 @@ if __name__ == "__main__":
 
         rate = RateLimiter(frequency=200.0, warn=False)
         while viewer.is_running():
-            # Update task targets.
-            base_pose = data.mocap_pos[base_mid].copy()
-            base_pose[2] = 0
-            data.mocap_pos[base_mid] = base_pose
-            # base_rpy = mink.SO3(data.mocap_quat[base_mid]).as_rpy_radians()
-            # data.mocap_quat[base_mid] = mink.SO3.from_z_radians(base_rpy.yaw).wxyz
-            base_task.set_target(mink.SE3.from_mocap_id(data, base_mid))
+            base_task.set_target(mink.SE3.from_mocap_name(model, data, "base_target"))
+            l_ee_task.set_target(
+                mink.SE3.from_mocap_name(model, data, "left_gripper_target")
+            )
+            r_ee_task.set_target(
+                mink.SE3.from_mocap_name(model, data, "right_gripper_target")
+            )
 
-            l_ee_task.set_target(mink.SE3.from_mocap_id(data, l_mid))
-            r_ee_task.set_target(mink.SE3.from_mocap_id(data, r_mid))
-
-            # Continuously check for autonomous key movement.
             key_callback.auto_key_move()
 
-            # Compute velocity and integrate into the next configuration.
-            for i in range(max_iters):
+            for _ in range(MAX_ITERS):
                 vel = mink.solve_ik(
                     configuration,
                     tasks,
                     rate.dt,
-                    solver,
+                    "daqp",
                     limits=limits,
-                    damping=1e-5,
                 )
                 configuration.integrate_inplace(vel, rate.dt)
 
-                l_err = l_ee_task.compute_error(configuration)
-                l_pos_achieved = np.linalg.norm(l_err[:3]) <= pos_threshold
-                l_ori_achieved = np.linalg.norm(l_err[3:]) <= ori_threshold
-                r_err = r_ee_task.compute_error(configuration)
-                r_pos_achieved = np.linalg.norm(r_err[:3]) <= pos_threshold
-                r_ori_achieved = np.linalg.norm(r_err[3:]) <= ori_threshold
-                if (
-                    l_pos_achieved
-                    and l_ori_achieved
-                    and r_pos_achieved
-                    and r_ori_achieved
-                ):
+                if configuration_reached(
+                    configuration, l_ee_task
+                ) and configuration_reached(configuration, r_ee_task):
                     break
 
             data.ctrl[actuator_ids] = configuration.q[dof_ids]
             mujoco.mj_step(model, data)
 
+            # for visualization of the fromto sensors
             mujoco.mj_fwdPosition(model, data)
-            mujoco.mj_sensorPos(model, data)# Update the viewer with the new data.
+            mujoco.mj_sensorPos(model, data)
 
-            # Visualize at fixed FPS.
             viewer.sync()
             rate.sleep()

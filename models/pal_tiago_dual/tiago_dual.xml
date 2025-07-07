@@ -61,23 +61,16 @@
   </asset>
 
   <default>
-    <default class="tiago">
-      <default class="visual">
-        <geom type="mesh" contype="0" conaffinity="0" group="2"/>
-      </default>
-      <default class="collision">
-        <!-- 
-        NOTE: The real collision geometries are watertight meshes but the distance calculation dosen't work with 
-        type="mesh", setting it to capsule here and then later overwriting it with the mesh when specifying the geom fixes it
-        -->
-        <geom type="capsule" group="3"/>
-      </default> 
+    <default class="visual">
+      <geom type="mesh" contype="0" conaffinity="0" group="2"/>
     </default>
-  </default>
-
-  <default class="main">
-    <geom contype="0" conaffinity="1" group="1" type="mesh" mass="0"/>
-    <joint axis="0 0 1"/>
+    <default class="collision">
+    <!-- 
+    NOTE: The real collision geometries are watertight meshes but the distance calculation dosen't work with 
+    type="mesh", setting it to capsule here and then later overwriting it with the mesh when specifying the geom fixes it
+    -->
+      <geom type="capsule" group="3"/>
+    </default> 
     <default class="arm">
       <geom contype="1" conaffinity="1"/>
       <joint frictionloss="1"/>
@@ -94,37 +87,37 @@
       <joint name="base_x" type="slide" axis="1 0 0"/>
       <joint name="base_y" type="slide" axis="0 1 0"/>
       <joint name="base_th"/>
-      <geom pos="0 0 0.0762" material="gray75" mesh="base_link"/>
-      <geom pos="-0.27512 0.18297 0.20864" quat="0 -0.382683 -0.92388 0" material="gray10" mesh="sick_tim551"/>
-      <geom pos="0.27512 -0.18297 0.20864" quat="0 -0.92388 0.382683 0" material="gray10" mesh="sick_tim551"/>
-      <geom pos="0.3535 0 0.1358" material="gray25" mesh="base_dock_link"/>
-      <geom pos="-0.2015 -0.13 0.2927" material="black" mesh="antenna"/>
-      <geom pos="-0.2015 0.13 0.2927" material="black" mesh="antenna"/>
-      <geom pos="-0.062 0 0.2692" material="mercury" mesh="torso_fix"/>
-      <geom size="0.09 0.1 0.275" pos="-0.062 0 0.5462" type="box" material="gray10"/>
+      <geom class="visual" pos="0 0 0.0762" material="gray75" mesh="base_link"/>
+      <geom class="visual" pos="-0.27512 0.18297 0.20864" quat="0 -0.382683 -0.92388 0" material="gray10" mesh="sick_tim551"/>
+      <geom class="visual" pos="0.27512 -0.18297 0.20864" quat="0 -0.92388 0.382683 0" material="gray10" mesh="sick_tim551"/>
+      <geom class="visual" pos="0.3535 0 0.1358" material="gray25" mesh="base_dock_link"/>
+      <geom class="visual" pos="-0.2015 -0.13 0.2927" material="black" mesh="antenna"/>
+      <geom class="visual" pos="-0.2015 0.13 0.2927" material="black" mesh="antenna"/>
+      <geom class="visual" pos="-0.062 0 0.2692" material="mercury" mesh="torso_fix"/>
+      <geom class="visual" size="0.09 0.1 0.275" pos="-0.062 0 0.5462" type="box" material="gray10"/>
       <body name="wheel_front_right_link" pos="0.244 -0.223175 0.0762" quat="1 -1 0 0" childclass="wheel">
         <inertial pos="0 0 -0.000226" mass="0.997903" diaginertia="0.000634 0.000634 0.001139"/>
         <!-- <joint name="wheel_front_right_joint" actuatorfrcrange="-400 400"/> -->
-        <geom material="gray10" mesh="wheel_link_right" conaffinity="0"/>
-        <geom type="cylinder" size="0.0762 0.025" group="3"/>
+        <geom class="visual" material="gray10" mesh="wheel_link_right" conaffinity="0"/>
+        <geom class="visual" type="cylinder" size="0.0762 0.025" group="3"/>
       </body>
       <body name="wheel_front_left_link" pos="0.244 0.223175 0.0762" quat="1 -1 0 0" childclass="wheel">
         <inertial pos="0 0 -0.000226" mass="0.997903" diaginertia="0.000634 0.000634 0.001139"/>
         <!-- <joint name="wheel_front_left_joint" actuatorfrcrange="-400 400"/> -->
-        <geom material="gray10" mesh="wheel_link_left" conaffinity="0"/>
-        <geom type="cylinder" size="0.0762 0.025" group="3"/>
+        <geom class="visual" material="gray10" mesh="wheel_link_left" conaffinity="0"/>
+        <geom class="visual" type="cylinder" size="0.0762 0.025" group="3"/>
       </body>
       <body name="wheel_rear_right_link" pos="-0.244 -0.223175 0.0762" quat="1 -1 0 0" childclass="wheel">
         <inertial pos="0 0 -0.000226" mass="0.997903" diaginertia="0.000634 0.000634 0.001139"/>
         <!-- <joint name="wheel_rear_right_joint" actuatorfrcrange="-400 400"/> -->
-        <geom material="gray10" mesh="wheel_link_right" conaffinity="0"/>
-        <geom type="cylinder" size="0.0762 0.025" group="3"/>
+        <geom class="visual" material="gray10" mesh="wheel_link_right" conaffinity="0"/>
+        <geom class="visual" type="cylinder" size="0.0762 0.025" group="3"/>
       </body>
       <body name="wheel_rear_left_link" pos="-0.244 0.223175 0.0762" quat="1 -1 0 0" childclass="wheel">
         <inertial pos="0 0 -0.000226" mass="0.997903" diaginertia="0.000634 0.000634 0.001139"/>
         <!-- <joint name="wheel_rear_left_joint" actuatorfrcrange="-400 400"/> -->
-        <geom material="gray10" mesh="wheel_link_left" conaffinity="0"/>
-        <geom type="cylinder" size="0.0762 0.025" group="3"/>
+        <geom class="visual" material="gray10" mesh="wheel_link_left" conaffinity="0"/>
+        <geom class="visual" type="cylinder" size="0.0762 0.025" group="3"/>
       </body>
       <body name="torso_lift_link" pos="-0.062 0 0.8662">
         <inertial pos="0.039536 -0.002841 -0.190987" mass="7.338946" diaginertia="0.229088 0.245188 0.092397"/>
@@ -134,7 +127,7 @@
         <body name="head_1_link" pos="0.182 0 0">
           <inertial pos="-0.00508 0.00237 0.07229" mass="0.6222" diaginertia="0.00140223 0.00121968 0.000861083"/>
           <joint name="head_1_joint" range="-1.309 1.309" actuatorfrcrange="-5.197 5.197" damping="0.5"/>
-          <geom material="white" mesh="head_1"/>
+          <geom class="visual" material="white" mesh="head_1"/>
           <body name="head_2_link" pos="0.005 0 0.098" quat="1 1 0 0">
             <inertial pos="0.0558274 0.0609987 1.58542e-05" mass="0.88693" diaginertia="0.00554181 0.00436261 0.00347586"/>
             <joint name="head_2_joint" range="-1.0472 0.785398" actuatorfrcrange="-5.197 5.197" damping="0.5"/>

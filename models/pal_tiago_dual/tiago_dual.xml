@@ -71,10 +71,7 @@
     -->
       <geom type="capsule" group="3"/>
     </default> 
-    <default class="arm">
-      <geom contype="1" conaffinity="1"/>
-      <joint frictionloss="1"/>
-    </default>
+  </default>
 
   <worldbody>
     <body name="base_link">
@@ -131,7 +128,7 @@
             <geom class="collision" name="head_2_collision" mesh="head_2_collision"/>
           </body>
         </body>
-        <body name="arm_left_1_link" pos="0.02556 0.19 -0.171" quat="0 1 1 0" childclass="arm">
+        <body name="arm_left_1_link" pos="0.02556 0.19 -0.171" quat="0 1 1 0">
           <inertial pos="0.061191 -0.022397 0.012835" mass="1.56343" diaginertia="0.00510233 0.00510233 0.00510233"/>
           <joint name="arm_left_1_joint" range="-1.1781 1.5708" actuatorfrcrange="-43 43" damping="40"/>
           <geom class="visual" material="white" mesh="arm_left_1"/>
@@ -189,7 +186,7 @@
             </body>
           </body>
         </body>
-        <body name="arm_right_1_link" pos="0.02556 -0.19 -0.171" quat="1 0 0 -1" childclass="arm">
+        <body name="arm_right_1_link" pos="0.02556 -0.19 -0.171" quat="1 0 0 -1">
           <inertial pos="0.061191 -0.022397 -0.012835" mass="1.56343" diaginertia="0.00510233 0.00510233 0.00510233"/>
           <joint name="arm_right_1_joint" range="-1.1781 1.5708" actuatorfrcrange="-43 43" damping="40"/>
           <geom class="visual" material="white" mesh="arm_right_1"/>

@@ -75,10 +75,6 @@
       <geom contype="1" conaffinity="1"/>
       <joint frictionloss="1"/>
     </default>
-    <default class="wheel">
-      <geom condim="6"/>
-    </default>
-  </default>
 
   <worldbody>
     <body name="base_link">
@@ -95,29 +91,29 @@
       <geom class="visual" pos="-0.2015 0.13 0.2927" material="black" mesh="antenna"/>
       <geom class="visual" pos="-0.062 0 0.2692" material="mercury" mesh="torso_fix"/>
       <geom class="visual" size="0.09 0.1 0.275" pos="-0.062 0 0.5462" type="box" material="gray10"/>
-      <body name="wheel_front_right_link" pos="0.244 -0.223175 0.0762" quat="1 -1 0 0" childclass="wheel">
+      <body name="wheel_front_right_link" pos="0.244 -0.223175 0.0762" quat="1 -1 0 0">
         <inertial pos="0 0 -0.000226" mass="0.997903" diaginertia="0.000634 0.000634 0.001139"/>
         <!-- <joint name="wheel_front_right_joint" actuatorfrcrange="-400 400"/> -->
-        <geom class="visual" material="gray10" mesh="wheel_link_right" conaffinity="0"/>
-        <geom class="visual" type="cylinder" size="0.0762 0.025" group="3"/>
+        <geom class="visual" material="gray10" mesh="wheel_link_right"/>
+        <geom class="collision" type="cylinder" size="0.0762 0.025"/>
       </body>
-      <body name="wheel_front_left_link" pos="0.244 0.223175 0.0762" quat="1 -1 0 0" childclass="wheel">
+      <body name="wheel_front_left_link" pos="0.244 0.223175 0.0762" quat="1 -1 0 0">
         <inertial pos="0 0 -0.000226" mass="0.997903" diaginertia="0.000634 0.000634 0.001139"/>
         <!-- <joint name="wheel_front_left_joint" actuatorfrcrange="-400 400"/> -->
-        <geom class="visual" material="gray10" mesh="wheel_link_left" conaffinity="0"/>
-        <geom class="visual" type="cylinder" size="0.0762 0.025" group="3"/>
+        <geom class="visual" material="gray10" mesh="wheel_link_left"/>
+        <geom class="collision" type="cylinder" size="0.0762 0.025"/>
       </body>
-      <body name="wheel_rear_right_link" pos="-0.244 -0.223175 0.0762" quat="1 -1 0 0" childclass="wheel">
+      <body name="wheel_rear_right_link" pos="-0.244 -0.223175 0.0762" quat="1 -1 0 0">
         <inertial pos="0 0 -0.000226" mass="0.997903" diaginertia="0.000634 0.000634 0.001139"/>
         <!-- <joint name="wheel_rear_right_joint" actuatorfrcrange="-400 400"/> -->
-        <geom class="visual" material="gray10" mesh="wheel_link_right" conaffinity="0"/>
-        <geom class="visual" type="cylinder" size="0.0762 0.025" group="3"/>
+        <geom class="visual" material="gray10" mesh="wheel_link_right"/>
+        <geom class="collision" type="cylinder" size="0.0762 0.025"/>
       </body>
-      <body name="wheel_rear_left_link" pos="-0.244 0.223175 0.0762" quat="1 -1 0 0" childclass="wheel">
+      <body name="wheel_rear_left_link" pos="-0.244 0.223175 0.0762" quat="1 -1 0 0">
         <inertial pos="0 0 -0.000226" mass="0.997903" diaginertia="0.000634 0.000634 0.001139"/>
         <!-- <joint name="wheel_rear_left_joint" actuatorfrcrange="-400 400"/> -->
-        <geom class="visual" material="gray10" mesh="wheel_link_left" conaffinity="0"/>
-        <geom class="visual" type="cylinder" size="0.0762 0.025" group="3"/>
+        <geom class="visual" material="gray10" mesh="wheel_link_left"/>
+        <geom class="collision" type="cylinder" size="0.0762 0.025"/>
       </body>
       <body name="torso_lift_link" pos="-0.062 0 0.8662">
         <inertial pos="0.039536 -0.002841 -0.190987" mass="7.338946" diaginertia="0.229088 0.245188 0.092397"/>

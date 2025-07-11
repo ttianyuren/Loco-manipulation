@@ -31,7 +31,7 @@ Keyboard-based control of the end effector is currently implemented using the [k
 
 ## Robot Model
 
-The MuJoCo model for the dual-arm Tiago robot is taken from the [mujoco_menagerie](https://github.com/google-deepmind/mujoco_menagerie/tree/main/pal_tiago_dual) repository.
+The MuJoCo model for the dual-arm Tiago robot is sourced from the [mujoco_menagerie](https://github.com/google-deepmind/mujoco_menagerie/tree/main/pal_tiago_dual) repository.  For details on modifications or updates made to the model, please refer to the corresponding [CHANGELOG.md](./models/pal_tiago_dual/CHANGELOG.md).
 
 ## Code Formatting
 

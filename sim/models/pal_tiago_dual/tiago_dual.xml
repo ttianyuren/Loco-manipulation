@@ -231,13 +231,13 @@
                         <inertial pos="0.008658 0.019724 -0.149125" mass="0.107001" diaginertia="0.000242 0.000236 0.000018"/>
                         <joint name="gripper_right_right_finger_joint" axis="1 0 0" type="slide" range="0 0.045" damping="1"/>
                         <geom class="visual" quat="4.63268e-05 0 0 1" material="black" mesh="gripper_right_finger_link"/>
-                        <geom class="collision" name="finger_right_right_collision" quat="4.63268e-05 0 0 1" mesh="gripper_right_finger_link_collision"/>
+                        <geom class="collision" name="gripper_right_right_finger_collision" quat="4.63268e-05 0 0 1" mesh="gripper_right_finger_link_collision"/>
                       </body>
                       <body name="gripper_right_left_finger_link" pos="0 0 0.076575" quat="0 -1 1 0">
                         <inertial pos="-0.008658 -0.019724 -0.149125" mass="0.107001" diaginertia="0.000242 0.000236 0.000018"/>
                         <joint name="gripper_right_left_finger_joint" axis="-1 0 0" type="slide" range="0 0.045" damping="1"/>
                         <geom class="visual" quat="4.63268e-05 0 0 1" material="black" mesh="gripper_left_finger_link"/>
-                        <geom class="collision" name="finger_right_left_collision" quat="4.63268e-05 0 0 1" mesh="gripper_left_finger_link_collision"/>
+                        <geom class="collision" name="gripper_right_left_finger_collision" quat="4.63268e-05 0 0 1" mesh="gripper_left_finger_link_collision"/>
                       </body>
                     </body>
                   </body>

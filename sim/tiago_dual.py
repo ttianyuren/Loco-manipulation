@@ -82,7 +82,7 @@ if __name__ == "__main__":
     ]
 
     collision_pairs = [
-        (["gripper_left_right_finger_collision"], ["tabletop"]),
+        (["gripper_left_right_finger_collision"], ["table_collision"]),
     ]
 
     collision_avoidance_limit = mink.CollisionAvoidanceLimit(

@@ -21,12 +21,13 @@
     <light name="spotlight" mode="targetbody" target="base_link" pos="1 0 10"/>
     <geom name="floor" size="0 0 1" type="plane" material="MatPlane" contype="1" conaffinity="1"/>
     
-    <body name="table" pos="0.7 0 0" quat="0.7071 0 0 0.7071">
-      <geom name="tabletop" type="box" size="0.5625 0.375 0.01" pos="0 0 0.66" rgba="0.35 0.35 0.35 1"/>
-      <geom type="box" size="0.01875 0.01875 0.325" pos=" 0.525  0.3375 0.325" rgba="0.3 0.3 0.3 1" mass="2"/>
-      <geom type="box" size="0.01875 0.01875 0.325" pos="-0.525  0.3375 0.325" rgba="0.3 0.3 0.3 1" mass="2"/>
-      <geom type="box" size="0.01875 0.01875 0.325" pos=" 0.525 -0.3375 0.325" rgba="0.3 0.3 0.3 1" mass="2"/>
-      <geom type="box" size="0.01875 0.01875 0.325" pos="-0.525 -0.3375 0.325" rgba="0.3 0.3 0.3 1" mass="2"/>
+    <body name="table" pos="0.8 0 0" quat="0.7071 0 0 0.7071">
+      <geom class="visual" type="box" size="0.5625 0.375 0.01" pos="0 0 0.66" rgba="0.35 0.35 0.35 1"/>
+      <geom class="visual" type="box" size="0.01875 0.01875 0.325" pos=" 0.525  0.3375 0.325" rgba="0.3 0.3 0.3 1"/>
+      <geom class="visual" type="box" size="0.01875 0.01875 0.325" pos="-0.525  0.3375 0.325" rgba="0.3 0.3 0.3 1"/>
+      <geom class="visual" type="box" size="0.01875 0.01875 0.325" pos=" 0.525 -0.3375 0.325" rgba="0.3 0.3 0.3 1"/>
+      <geom class="visual" type="box" size="0.01875 0.01875 0.325" pos="-0.525 -0.3375 0.325" rgba="0.3 0.3 0.3 1"/>
+      <geom class="collision" name="table_collision" type="box" size="0.5625 0.375 0.335" pos="0 0 0.325" rgba="0.3 0.3 0.3 1"/> 
     </body>
 
     <!--  Add motion capture geometries -->
@@ -58,7 +59,7 @@
   </keyframe>
 
   <sensor>
-    <fromto geom1="gripper_left_right_finger_collision" geom2="tabletop" cutoff="1"/>
+    <fromto geom1="gripper_left_right_finger_collision" geom2="table_collision" cutoff="1"/>
   </sensor>
 
 </mujoco>

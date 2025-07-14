@@ -1,4 +1,4 @@
-<mujoco model="tiago dual position scene">
+<mujoco model="Tiago Dual Mink">
 
   <!-- Include the robot's control configuration file here. 
    Change the filename to switch between different control methods, such as position, velocity, or motor control. 

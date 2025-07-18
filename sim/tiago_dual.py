@@ -150,9 +150,8 @@ if __name__ == "__main__":
                     break
 
 
-            # NOTE: No actuator dynamics, limits or physical motion are applied, this overrides the state instantly!!
-            data.qpos[:] = np.array(configuration.q, dtype=float)
-            # data.ctrl[actuator_ids] = configuration.q[dof_ids]
+            # data.qpos[:] = np.array(configuration.q, dtype=float) # Set configuration directly
+            data.ctrl[actuator_ids] = configuration.q[dof_ids] # Set configuration with actuator dynamics
             mujoco.mj_step(model, data)
 
             # for visualization of the fromto sensors

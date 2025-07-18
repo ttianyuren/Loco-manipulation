@@ -1,4 +1,5 @@
 from pathlib import Path
+import time
 
 from utils import configuration_reached
 import mink
@@ -124,6 +125,7 @@ if __name__ == "__main__":
         )
 
         rate = RateLimiter(frequency=200.0, warn=False)
+        cnt = 0
         while viewer.is_running():
             base_task.set_target(mink.SE3.from_mocap_name(model, data, "base_target"))
             l_ee_task.set_target(
@@ -135,6 +137,7 @@ if __name__ == "__main__":
 
             key_callback.auto_key_move()
 
+            start = time.process_time()
             for _ in range(MAX_ITERS):
                 vel = mink.solve_ik(
                     configuration,
@@ -149,7 +152,12 @@ if __name__ == "__main__":
                     configuration, l_ee_task
                 ) and configuration_reached(configuration, r_ee_task):
                     break
+            end = time.process_time()
 
+            if cnt % 10 == 0:
+                print(f"IK time: {(end - start) * 1000:.3f} ms")
+                cnt = 0
+            cnt += 1
 
             # NOTE: No actuator dynamics, limits or physical motion are applied, this overrides the state instantly!!
             # data.qpos[:] = np.array(configuration.q, dtype=float)

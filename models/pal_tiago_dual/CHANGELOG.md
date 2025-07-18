@@ -26,3 +26,9 @@ All notable changes to this model will be documented in this file.
 - **Replaced box collision geometries with capsules**:
   - Distance calculations between box-to-box geometries in MuJoCo are unreliable (may be fixed by [mujoco#2710](https://github.com/google-deepmind/mujoco/issues/2710)).
   - Mink collision constraints do not work with the unreliable distance calculations, making them unusable. Instead capsules were used to approximate the boxes, While not an ideal approximation it fixes the collision constraints
+
+## [18/06/2025]
+
+- **Adjust torso and arm controller parameters and force limits**:
+  - Increase the torso actuator force range to [-2000, 2000] Nm based on the URDF description of dual arm Tiago.
+  - Updated damping values on the arm joints.

@@ -1,13 +1,36 @@
-# Byte-compiled / optimized / DLL files
+# Python bytecode and cache
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyo
 
-# Virtual environment
+# Virtual environments
 venv/
 env/
+.venv/
+.env/
+
+# Packaging
+*.egg-info/
+dist/
+build/
 
 # Editor and OS files
 *.swp
 .DS_Store
 Thumbs.db
+.vscode/
+.idea/
+
+# MuJoCo/Simulation files
+*_LOG.TXT
+*.mp4
+*.avi
+*.mjb
+*.xml.bak
+
+# Random/temporary files
+*.tmp
+*.temp
+*.bak
+*~

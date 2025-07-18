@@ -1,7 +1,7 @@
 from pathlib import Path
 import time
 
-from utils import configuration_reached
+from utils import configuration_reached, geom_distance, add_fromto_sensors
 import mink
 import mujoco
 import mujoco.viewer
@@ -43,6 +43,8 @@ VEL_LIMITS = dict(CONTROLLED_JOINTS_AND_LIMITS)
 
 MAX_ITERS = 10  # max iterations to solve IK per step
 
+add_fromto_sensors(_XML.as_posix(), [ "gripper_left_right_finger_collision", "gripper_left_left_finger_collision", "arm_left_5_collision", "gripper_left_collision"], ["table_collision"], cutoff=1.0)
+
 if __name__ == "__main__":
     model = mujoco.MjModel.from_xml_path(_XML.as_posix())
     data = mujoco.MjData(model)
@@ -83,7 +85,55 @@ if __name__ == "__main__":
     ]
 
     collision_pairs = [
-        (["gripper_left_right_finger_collision"], ["tabletop"]),
+        # don’t drive into external objects
+        # (
+        #     [
+        #         "gripper_left_right_finger_collision",
+        #     ],
+        #     ["table_collision"],
+        # ),
+        # don't hit external objects with the left arm
+        (
+            [
+                "gripper_left_right_finger_collision",
+                "gripper_left_left_finger_collision",
+                "arm_left_5_collision",
+                "gripper_left_collision",
+            ],
+            ["table_collision"],
+        ),
+        # # don’t hit the body with the right arm
+        # (
+        #     [
+        #         "gripper_right_right_finger_collision",
+        #         "gripper_right_left_finger_collision",
+        #         "arm_right_5_collision",
+        #         "arm_right_4_collision",
+        #         "gripper_right_collision",
+        #     ],
+        #     [
+        #         "torso_bottom_lift_collision",
+        #         "torso_top_lift_collision",
+        #         "head_2_collision",
+        #     ],
+        # ),
+        # # don’t hit the body with the left arm
+        # (
+        #     [
+        #         "gripper_left_right_finger_collision",
+        #         "gripper_left_right_finger_collision",
+        #         "arm_left_5_collision",
+        #         "arm_left_4_collision",
+        #         "gripper_left_collision",
+        #     ],
+        #     [
+        #         "torso_bottom_lift_collision",
+        #         "torso_top_lift_collision",
+        #         "head_2_collision",
+        #     ],
+        # ),
+        # # ([""], [])
+        # # TODO: add left arm to right arm collision pairs¶
     ]
 
     collision_avoidance_limit = mink.CollisionAvoidanceLimit(
@@ -91,6 +141,7 @@ if __name__ == "__main__":
         geom_pairs=collision_pairs,
         minimum_distance_from_collisions=0.1,
         collision_detection_distance=0.15,
+        gain=0.01
     )
 
     limits = [
@@ -104,7 +155,6 @@ if __name__ == "__main__":
     with mujoco.viewer.launch_passive(
         model=model,
         data=data,
-        show_left_ui=False,
         show_right_ui=False,
         key_callback=key_callback,
     ) as viewer:
@@ -123,6 +173,7 @@ if __name__ == "__main__":
         mink.move_mocap_to_frame(
             model, data, "right_gripper_target", "right_gripper", "site"
         )
+
 
         rate = RateLimiter(frequency=200.0, warn=False)
         cnt = 0
@@ -145,6 +196,7 @@ if __name__ == "__main__":
                     rate.dt,
                     "daqp",
                     limits=limits,
+                    verbose=True
                 )
                 configuration.integrate_inplace(vel, rate.dt)
 
@@ -156,12 +208,14 @@ if __name__ == "__main__":
 
             if cnt % 10 == 0:
                 print(f"IK time: {(end - start) * 1000:.3f} ms")
+                dist = geom_distance(model, data, "gripper_left_right_finger_collision", "table_collision")
+                print(f"Distance between 'gripper_left_right_finger_collision' and 'table_collision': {dist:.3f}m")
                 cnt = 0
             cnt += 1
 
             # NOTE: No actuator dynamics, limits or physical motion are applied, this overrides the state instantly!!
-            # data.qpos[:] = np.array(configuration.q, dtype=float)
-            data.ctrl[actuator_ids] = configuration.q[dof_ids]
+            data.qpos[:] = np.array(configuration.q, dtype=float)
+            # data.ctrl[actuator_ids] = configuration.q[dof_ids]
             mujoco.mj_step(model, data)
 
             # for visualization of the fromto sensors

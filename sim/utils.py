@@ -48,3 +48,27 @@ def add_fromto_sensors(xml_path, target_geoms, goal_geoms, cutoff=1.0):
             sensor_elem.append(fromto_elem)
 
     tree.write(xml_path)
+
+
+def geom_distance(
+    model, data, geom1_name: str, geom2_name: str, distmax: float = 1.0
+) -> float:
+    """
+    Calculate the minimum distance between two geoms using mujoco.mj_geomDistance
+    https://mujoco.readthedocs.io/en/stable/APIreference/APIfunctions.html#mj-geomdistance"
+
+    Args:
+        model: The MuJoCo model object.
+        data: The MuJoCo data object.
+        geom1_name (str): Name of the first geometry.
+        geom2_name (str): Name of the second geometry.
+        distmax (float): The maximum distance to consider.
+
+    Returns:
+        float: The minimum distance between the two geoms or distmax if the distance is greater than distmax.
+    """
+    geom1_id = model.geom(geom1_name).id
+    geom2_id = model.geom(geom2_name).id
+    fromto = np.zeros(6)
+    dist = mujoco.mj_geomDistance(model, data, geom1_id, geom2_id, distmax, fromto)
+    return dist

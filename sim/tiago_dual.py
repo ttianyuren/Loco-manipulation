@@ -154,4 +154,4 @@ if __name__ == "__main__":
             mujoco.mj_sensorPos(model, data)
 
             viewer.sync()
-            rate.sleep()
+            # rate.sleep()

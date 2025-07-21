@@ -149,7 +149,9 @@ if __name__ == "__main__":
                 ) and configuration_reached(configuration, r_ee_task):
                     break
 
-            data.ctrl[actuator_ids] = configuration.q[dof_ids]
+
+            # data.qpos[:] = np.array(configuration.q, dtype=float) # Set configuration directly
+            data.ctrl[actuator_ids] = configuration.q[dof_ids] # Set configuration with actuator dynamics
             mujoco.mj_step(model, data)
 
             # for visualization of the fromto sensors

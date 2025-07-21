@@ -103,7 +103,6 @@ if __name__ == "__main__":
     with mujoco.viewer.launch_passive(
         model=model,
         data=data,
-        show_left_ui=False,
         show_right_ui=False,
         key_callback=key_callback,
     ) as viewer:

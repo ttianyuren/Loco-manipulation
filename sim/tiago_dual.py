@@ -134,20 +134,15 @@ if __name__ == "__main__":
 
             key_callback.auto_key_move()
 
-            for _ in range(MAX_ITERS):
-                vel = mink.solve_ik(
-                    configuration,
-                    tasks,
-                    rate.dt,
-                    "daqp",
-                    limits=limits,
-                )
-                configuration.integrate_inplace(vel, rate.dt)
 
-                if configuration_reached(
-                    configuration, l_ee_task
-                ) and configuration_reached(configuration, r_ee_task):
-                    break
+            vel = mink.solve_ik(
+                configuration,
+                tasks,
+                rate.dt,
+                "daqp",
+                limits=limits,
+            )
+            configuration.integrate_inplace(vel, rate.dt)
 
 
             # data.qpos[:] = np.array(configuration.q, dtype=float) # Set configuration directly
@@ -159,4 +154,4 @@ if __name__ == "__main__":
             mujoco.mj_sensorPos(model, data)
 
             viewer.sync()
-            rate.sleep()
+            # rate.sleep()

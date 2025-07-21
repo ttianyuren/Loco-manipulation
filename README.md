@@ -1,14 +1,14 @@
-# Whole Body Teleoperation for Dual-Arm Tiago
+# Differential IK Servoing in MuJoCo
 
-Whole-body teleoperation of a dual-arm Tiago robot equipped with a holonomic base. It uses [mink](https://github.com/kevinzakka/mink) for differential inverse kinematics (IK).
+Differential inverse kinematics (IK) servoing for whole-body teleoperation in MuJoCo, using [mink](https://github.com/kevinzakka/mink).
 
 ## Setup
 
 Create and activate a virtual environment using Conda:
 
 ```bash
-conda create -n tiago_teleop python=3.12
-conda activate tiago_teleop
+conda create -n mink_servo python=3.12
+conda activate mink_servo
 ```
 
 Install the required Python packages:
@@ -17,17 +17,31 @@ Install the required Python packages:
 pip install -r requirements.txt
 ```
 
-## Running the Example
+## Dual-Arm Tiago Example
 
-Run the teleoperation example with:
+To launch the dual-arm Tiago simulation (24 degrees of freedom), run:
 
 ```bash
 python3 sim/tiago_dual.py
 ```
 
-## Keyboard Control
+## Controlling the Robot
 
-Keyboard-based control of the end effector is currently implemented using the [keyboard module](https://github.com/kevinzakka/mink/tree/main/mink/contrib/keyboard_teleop) from Mink. The key mappings can be found in the corresponding [KEYBOARD.md](https://github.com/kevinzakka/mink/blob/main/mink/contrib/keyboard_teleop/KEYBOARD.md) file.
+### Keyboard
+
+Keyboard-based control of the end effector is implemented using the [keyboard module](https://github.com/kevinzakka/mink/tree/main/mink/contrib/keyboard_teleop) from Mink. The key mappings can be found in the corresponding [KEYBOARD.md](https://github.com/kevinzakka/mink/blob/main/mink/contrib/keyboard_teleop/KEYBOARD.md) file.
+
+### MoCAPs
+
+The robot can also be controlled using [MoCap bodies](https://mujoco.readthedocs.io/en/stable/modeling.html#mocap-bodies), which allow interaction via mouse input. To use them:
+
+1. Double-click the desired MoCap box (blue or red) in the MuJoCo scene to select it.
+2. Then use the following mouse + keyboard combinations:
+
+   - `Ctrl + Right Mouse Button (Hold)`: Translate the MoCap (position control)  
+   - `Ctrl + Left Mouse Button (Hold)`: Rotate the MoCap (orientation control)
+
+This method provides an intuitive way to guide the robot by manipulating reference bodies directly in the scene.
 
 ## Robot Model
 

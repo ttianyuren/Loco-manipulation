@@ -20,3 +20,8 @@ All notable changes to this model will be documented in this file.
 - **Rationale**:
   - Using distance calculations directly from meshes led to issues, see [#1784](https://github.com/google-deepmind/mujoco/issues/1784#issuecomment-2303899197).
   - Simplified primitive shapes offer more stable and efficient collision handling in simulation.
+
+## [14/06/2025]
+
+- **Replaced box collision geometries with capsules**:
+  - Distance calculations between box-to-box geometries in MuJoCo have a bug [mujoco#2710](https://github.com/google-deepmind/mujoco/issues/2710), we therefore approximate the collision boxes by capsules. This should be removed once the bug has been fixed has capsules don't provide a good approximation.

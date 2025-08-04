@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIAGo Robot Web Control</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .main-content {
+            display: flex;
+            gap: 20px;
+        }
+        .video-container {
+            flex: 2;
+            text-align: center;
+        }
+        #robotFeed {
+            max-width: 100%;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transform: scaleY(-1); /* Flip the image vertically */
+        }
+        .controls {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .control-section {
+            margin-bottom: 25px;
+        }
+        .control-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .control-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .control-btn:hover {
+            background: #0056b3;
+        }
+        .control-btn:active {
+            background: #003d82;
+        }
+        .status-panel {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .slider-container {
+            margin: 15px 0;
+        }
+        .slider-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .slider {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .connection-status {
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        .disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .mocap-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .mocap-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #6c757d;
+            color: white;
+            cursor: pointer;
+        }
+        .mocap-btn.active {
+            background: #28a745;
+        }
+        .latency-info {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>TIAGo Robot Web Control Interface</h1>
+            <div id="connectionStatus" class="connection-status disconnected">
+                Disconnected
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="video-container">
+                <img id="robotFeed" src="" alt="Robot Camera Feed" style="display: none;">
+                <div id="noFeed" style="padding: 100px; background: #f8f9fa; border: 2px solid #ddd; border-radius: 8px;">
+                    <h3>No Video Feed</h3>
+                    <p>Connect to start receiving robot camera feed</p>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <div class="control-section">
+                    <h3>Robot Status</h3>
+                    <div class="status-panel">
+                        <div>Current Target: <span id="currentTarget">Base</span></div>
+                        <div>Step Size: <span id="stepSizeValue">0.02</span></div>
+                    </div>
+                </div>
+                
+                <div class="control-section">
+                    <h3>Target Selection</h3>
+                    <div class="mocap-selector">
+                        <button class="mocap-btn active" data-target="0">Base</button>
+                        <button class="mocap-btn" data-target="1">Left Arm</button>
+                        <button class="mocap-btn" data-target="2">Right Arm</button>
+                    </div>
+                </div>
+                
+                <div class="control-section">
+                    <h3>Movement Controls</h3>
+                    <div class="button-grid">
+                        <div></div>
+                        <button class="control-btn" onmousedown="startMovement('move_x', 1)" onmouseup="stopMovement()">↑ Forward</button>
+                        <div></div>
+                        <button class="control-btn" onmousedown="startMovement('move_y', -1)" onmouseup="stopMovement()">← Left</button>
+                        <button class="control-btn" onmousedown="startMovement('move_y', 1)" onmouseup="stopMovement()">→ Right</button>
+                        <div></div>
+                        <button class="control-btn" onmousedown="startMovement('move_x', -1)" onmouseup="stopMovement()">↓ Backward</button>
+                        <div></div>
+                    </div>
+                    
+                    <div class="button-grid">
+                        <button class="control-btn" onmousedown="startMovement('move_z', 1)" onmouseup="stopMovement()">↑ Up</button>
+                        <button class="control-btn" onmousedown="startMovement('move_z', -1)" onmouseup="stopMovement()">↓ Down</button>
+                        <button class="control-btn" onmousedown="startMovement('rotate_z', 1)" onmouseup="stopMovement()">↻ Rotate</button>
+                    </div>
+                </div>
+                
+                <div class="control-section">
+                    <h3>Settings</h3>
+                    <div class="slider-container">
+                        <label for="stepSize">Step Size:</label>
+                        <input type="range" id="stepSize" class="slider" min="0.001" max="0.1" step="0.001" value="0.02">
+                        <span id="stepSizeDisplay">0.02</span>
+                    </div>
+                </div>
+                
+                <div class="latency-info" id="latency-display">
+                    Avg Latency: N/A
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class RobotController {
+            constructor() {
+                this.socket = null;
+                this.currentMocapIndex = 0;
+                this.movementInterval = null;
+                this.targetNames = ['Base', 'Left Arm', 'Right Arm'];
+                
+                this.initializeUI();
+                this.connect();
+            }
+            
+            initializeUI() {
+                // Step size slider
+                const stepSizeSlider = document.getElementById('stepSize');
+                const stepSizeDisplay = document.getElementById('stepSizeDisplay');
+                
+                stepSizeSlider.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    stepSizeDisplay.textContent = value;
+                    document.getElementById('stepSizeValue').textContent = value;
+                    
+                    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+                        this.socket.send(JSON.stringify({
+                            type: 'set_step_size',
+                            value: value
+                        }));
+                    }
+                });
+                
+                // Mocap target buttons - fix the click handler
+                document.querySelectorAll('.mocap-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        // Just send switch command - server handles cycling
+                        this.switchMocapTarget();
+                    });
+                });
+            }
+            
+            connect() {
+                try {
+                    // Use same domain for WebSocket
+                    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                    const wsUrl = `${wsProtocol}//${window.location.host}/ws`;
+                    this.socket = new WebSocket(wsUrl);
+                    
+                    this.socket.onopen = () => {
+                        console.log('Connected to robot');
+                        this.updateConnectionStatus(true);
+                        
+                        // Start latency test
+                        this.latencyTester = new LatencyTester(this.socket);
+                        this.latencyTester.startLatencyTest();
+                    };
+                    
+                    this.socket.onmessage = (event) => {
+                        const data = JSON.parse(event.data);
+                        if (data.type === 'frame') {
+                            this.updateVideoFeed(data.data);
+                            this.updateMocapIndex(data.mocap_index);
+                        } else if (data.type === 'pong') {
+                            // Handle pong for latency test
+                            this.latencyTester.handlePong(data);
+                        }
+                    };
+                    
+                    this.socket.onclose = () => {
+                        console.log('Disconnected from robot');
+                        this.updateConnectionStatus(false);
+                        // Attempt to reconnect after 3 seconds
+                        setTimeout(() => this.connect(), 3000);
+                    };
+                    
+                    this.socket.onerror = (error) => {
+                        console.error('WebSocket error:', error);
+                    };
+                    
+                } catch (error) {
+                    console.error('Connection failed:', error);
+                    setTimeout(() => this.connect(), 3000);
+                }
+            }
+            
+            updateConnectionStatus(connected) {
+                const statusElement = document.getElementById('connectionStatus');
+                if (connected) {
+                    statusElement.textContent = 'Connected';
+                    statusElement.className = 'connection-status connected';
+                } else {
+                    statusElement.textContent = 'Disconnected';
+                    statusElement.className = 'connection-status disconnected';
+                }
+            }
+            
+            updateVideoFeed(imageData) {
+                const feedElement = document.getElementById('robotFeed');
+                const noFeedElement = document.getElementById('noFeed');
+                
+                feedElement.src = imageData;
+                feedElement.style.display = 'block';
+                noFeedElement.style.display = 'none';
+            }
+            
+            updateMocapIndex(index) {
+                if (index !== this.currentMocapIndex) {
+                    this.currentMocapIndex = index;
+                    document.getElementById('currentTarget').textContent = this.targetNames[index];
+                    
+                    // Update button states
+                    document.querySelectorAll('.mocap-btn').forEach((btn, i) => {
+                        if (i === index) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+                }
+            }
+            
+            switchMocapTarget() {
+                if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+                    this.socket.send(JSON.stringify({
+                        type: 'switch_mocap'
+                    }));
+                }
+            }
+            
+            sendControlCommand(command, direction) {
+                if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+                    this.socket.send(JSON.stringify({
+                        type: 'control',
+                        command: command,
+                        direction: direction
+                    }));
+                }
+            }
+        }
+        
+        // Add to your web interface for real-time latency measurement
+        class LatencyTester {
+            constructor(websocket) {
+                this.ws = websocket;
+                this.latencies = [];
+                this.startTime = null;
+            }
+            
+            startLatencyTest() {
+                setInterval(() => {
+                    this.startTime = performance.now();
+                    this.ws.send(JSON.stringify({
+                        type: 'ping',
+                        timestamp: this.startTime
+                    }));
+                }, 1000); // Test every second
+            }
+            
+            handlePong(data) {
+                if (this.startTime) {
+                    const latency = performance.now() - this.startTime;
+                    this.latencies.push(latency);
+                    console.log(`Latency: ${latency.toFixed(1)}ms`);
+                    
+                    // Keep only last 50 measurements
+                    if (this.latencies.length > 50) {
+                        this.latencies.shift();
+                    }
+                    
+                    // Update UI
+                    const avgLatency = this.latencies.reduce((a, b) => a + b) / this.latencies.length;
+                    document.getElementById('latency-display').textContent = 
+                        `Avg Latency: ${avgLatency.toFixed(1)}ms`;
+                }
+            }
+        }
+        
+        // Global controller instance
+        let robotController;
+        
+        // Movement control functions
+        function startMovement(command, direction) {
+            if (!robotController) return;
+            
+            // Send initial command
+            robotController.sendControlCommand(command, direction);
+            
+            // Continue sending commands while button is held
+            robotController.movementInterval = setInterval(() => {
+                robotController.sendControlCommand(command, direction);
+            }, 50); // Send every 50ms for smooth movement
+        }
+        
+        function stopMovement() {
+            if (robotController && robotController.movementInterval) {
+                clearInterval(robotController.movementInterval);
+                robotController.movementInterval = null;
+            }
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            robotController = new RobotController();
+        });
+        
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (!robotController) return;
+            
+            switch(e.key) {
+                case 'ArrowUp':
+                    e.preventDefault();
+                    startMovement('move_x', 1);
+                    break;
+                case 'ArrowDown':
+                    e.preventDefault();
+                    startMovement('move_x', -1);
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    startMovement('move_y', -1);
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    startMovement('move_y', 1);
+                    break;
+                case 'q':
+                case 'Q':
+                    startMovement('move_z', 1);
+                    break;
+                case 'e':
+                case 'E':
+                    startMovement('move_z', -1);
+                    break;
+                case ' ':
+                    e.preventDefault();
+                    robotController.switchMocapTarget();
+                    break;
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'ArrowDown':
+                case 'ArrowLeft':
+                case 'ArrowRight':
+                case 'q':
+                case 'Q':
+                case 'e':
+                case 'E':
+                    stopMovement();
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>

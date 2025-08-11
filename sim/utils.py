@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import mink
 import numpy as np
+import mujoco
 
 
 def configuration_reached(

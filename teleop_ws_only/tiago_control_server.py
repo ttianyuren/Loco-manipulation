@@ -306,7 +306,7 @@ class WebTiagoServer:
                     except Exception as e:
                         print(f"Error sending frame: {e}")
                 
-                await asyncio.sleep(0.033)  # ~30 FPS
+                await asyncio.sleep(0.01)  # ~100 FPS
         except asyncio.CancelledError:
             pass
     

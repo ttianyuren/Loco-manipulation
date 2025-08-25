@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Latency Elements</title>
+    <style>
+        .latency-metrics { 
+            border: 2px solid red; 
+            padding: 10px; 
+            margin: 10px;
+            background: #f0f0f0;
+        }
+        .latency-metric { 
+            border: 1px solid blue; 
+            margin: 5px;
+            padding: 5px;
+        }
+        .metric-value { 
+            font-weight: bold; 
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Debug Latency Elements</h1>
+    
+    <div id="latency-display">
+        <div style="font-weight: bold; margin-bottom: 10px;">Latency Monitor:</div>
+        <div class="latency-metrics">
+            <div class="latency-metric">
+                <span class="metric-label">Ping:</span>
+                <span id="ping-latency" class="metric-value">N/A</span>
+            </div>
+            <div class="latency-metric">
+                <span class="metric-label">Video:</span>
+                <span id="video-latency" class="metric-value">N/A</span>
+            </div>
+            <div class="latency-metric">
+                <span class="metric-label">Command:</span>
+                <span id="command-latency" class="metric-value">N/A</span>
+            </div>
+        </div>
+    </div>
+    
+    <button onclick="testElements()">Test Elements</button>
+    <div id="test-output"></div>
+    
+    <script>
+        function testElements() {
+            const output = document.getElementById('test-output');
+            let results = [];
+            
+            // Test basic elements
+            results.push('latency-display: ' + (document.getElementById('latency-display') ? 'FOUND' : 'NOT FOUND'));
+            results.push('.latency-metrics: ' + (document.querySelector('.latency-metrics') ? 'FOUND' : 'NOT FOUND'));
+            results.push('ping-latency: ' + (document.getElementById('ping-latency') ? 'FOUND' : 'NOT FOUND'));
+            results.push('video-latency: ' + (document.getElementById('video-latency') ? 'FOUND' : 'NOT FOUND'));
+            results.push('command-latency: ' + (document.getElementById('command-latency') ? 'FOUND' : 'NOT FOUND'));
+            
+            // Test updating
+            const pingElement = document.getElementById('ping-latency');
+            if (pingElement) {
+                pingElement.textContent = '25.3ms';
+                results.push('Updated ping-latency to 25.3ms');
+            }
+            
+            output.innerHTML = results.join('<br>');
+        }
+        
+        // Auto-test on load
+        setTimeout(testElements, 100);
+    </script>
+</body>
+</html>

@@ -29,6 +29,13 @@
         .mocap-btn { flex: 1; padding: 10px; border: none; border-radius: 5px; background: #6c757d; color: white; cursor: pointer; }
         .mocap-btn.active { background: #28a745; }
         .latency-info { margin-top: 20px; font-size: 0.9em; color: #666; }
+        .latency-metrics { display: flex; flex-direction: column; gap: 5px; }
+        .latency-metric { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
+        .metric-label { font-weight: 600; color: #333; }
+        .metric-value { font-family: 'Courier New', monospace; font-weight: bold; padding: 2px 6px; border-radius: 3px; background: #f8f9fa; }
+        .metric-value.good { color: #28a745; background: #d4f6dd; }
+        .metric-value.warning { color: #ffc107; background: #fff8db; }
+        .metric-value.bad { color: #dc3545; background: #f8d7da; }
     </style>
 </head>
 <body>
@@ -61,18 +68,17 @@
                     <h3>Movement Controls</h3>
                     <div class="button-grid">
                         <div></div>
-                        <button class="control-btn" onmousedown="startMovement('move_x', 1)" onmouseup="stopMovement()">↑ Forward</button>
+                        <button class="control-btn" onclick="singleStep('move_x', 1)">↑ Forward</button>
                         <div></div>
-                        <button class="control-btn" onmousedown="startMovement('move_y', -1)" onmouseup="stopMovement()">← Left</button>
-                        <button class="control-btn" onmousedown="startMovement('move_y', 1)" onmouseup="stopMovement()">→ Right</button>
-                        <div></div>
-                        <button class="control-btn" onmousedown="startMovement('move_x', -1)" onmouseup="stopMovement()">↓ Backward</button>
+                        <button class="control-btn" onclick="singleStep('move_y', -1)">← Left</button>
+                        <button class="control-btn" onclick="singleStep('move_x', -1)">↓ Backward</button>
+                        <button class="control-btn" onclick="singleStep('move_y', 1)">→ Right</button>
                         <div></div>
                     </div>
                     <div class="button-grid">
-                        <button class="control-btn" onmousedown="startMovement('move_z', 1)" onmouseup="stopMovement()">↑ Up</button>
-                        <button class="control-btn" onmousedown="startMovement('move_z', -1)" onmouseup="stopMovement()">↓ Down</button>
-                        <button class="control-btn" onmousedown="startMovement('rotate_z', 1)" onmouseup="stopMovement()">↻ Rotate</button>
+                        <button class="control-btn" onclick="singleStep('move_z', 1)">↑ Up</button>
+                        <button class="control-btn" onclick="singleStep('move_z', -1)">↓ Down</button>
+                        <button class="control-btn" onclick="singleStep('rotate_z', 1)">↻ Rotate</button>
                     </div>
                 </div>
                 <div class="control-section">
@@ -90,113 +96,27 @@
                         </select>
                     </div>
                 </div>
-                <div class="latency-info" id="latency-display">Avg Latency: N/A</div>
+                <div class="latency-info" id="latency-display">
+                    <div style="font-weight: bold; margin-bottom: 10px;">Latency Monitor:</div>
+                    <div class="latency-metrics">
+                        <div class="latency-metric">
+                            <span class="metric-label">Ping:</span>
+                            <span id="ping-latency" class="metric-value">N/A</span>
+                        </div>
+                        <div class="latency-metric">
+                            <span class="metric-label">Video:</span>
+                            <span id="video-latency" class="metric-value">N/A</span>
+                        </div>
+                        <div class="latency-metric">
+                            <span class="metric-label">Command:</span>
+                            <span id="command-latency" class="metric-value">N/A</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     <script src="webrtc.js"></script>
-    <script>
-        class RobotController {
-            constructor() {
-                this.socket = null;
-                this.currentMocapIndex = 0;
-                this.movementInterval = null;
-                this.targetNames = ['Base', 'Left Arm', 'Right Arm'];
-                this.initializeUI();
-                this.connect();
-            }
-            initializeUI() {
-                // Step size slider
-                const stepSizeSlider = document.getElementById('stepSize');
-                const stepSizeDisplay = document.getElementById('stepSizeDisplay');
-                stepSizeSlider.addEventListener('input', (e) => {
-                    const value = e.target.value;
-                    stepSizeDisplay.textContent = value;
-                    document.getElementById('stepSizeValue').textContent = value;
-                    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-                        this.socket.send(JSON.stringify({ type: 'set_step_size', value: value }));
-                    }
-                });
-                // Mocap target buttons - send set_mocap and update color immediately
-                document.querySelectorAll('.mocap-btn').forEach((btn, i) => {
-                    btn.addEventListener('click', () => {
-                        if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-                            this.socket.send(JSON.stringify({ type: 'set_mocap', index: i }));
-                        }
-                        this.updateMocapIndex(i); // Optimistic UI update
-                    });
-                });
-            }
-            connect() {
-                const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                const wsUrl = `${wsProtocol}//${window.location.host}/ws`;
-                this.socket = new WebSocket(wsUrl);
-                this.socket.onopen = () => {
-                    console.log('Connected to robot');
-                    this.updateConnectionStatus(true);
-                };
-                this.socket.onmessage = (event) => {
-                    const data = JSON.parse(event.data);
-                    if (data.type === 'frame') {
-                        this.updateVideoFeed(data.data);
-                        this.updateMocapIndex(data.mocap_index);
-                    }
-                };
-                this.socket.onclose = () => {
-                    this.updateConnectionStatus(false);
-                };
-            }
-            updateConnectionStatus(connected) {
-                const statusElement = document.getElementById('connectionStatus');
-                if (connected) {
-                    statusElement.textContent = 'Connected';
-                    statusElement.className = 'connection-status connected';
-                } else {
-                    statusElement.textContent = 'Disconnected';
-                    statusElement.className = 'connection-status disconnected';
-                }
-            }
-            updateMocapIndex(index) {
-                console.log('[UI] updateMocapIndex called with index:', index);
-                this.currentMocapIndex = index;
-                document.getElementById('currentTarget').textContent = this.targetNames[index];
-                document.querySelectorAll('.mocap-btn').forEach((btn, i) => {
-                    if (i == index) { // Use == to match string/number
-                        btn.classList.add('active');
-                        console.log('[UI] Activating button', i, btn.textContent);
-                    } else {
-                        btn.classList.remove('active');
-                    }
-                });
-            }
-            sendControlCommand(command, direction) {
-                if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-                    this.socket.send(JSON.stringify({ type: 'control', command, direction }));
-                }
-            }
-        }
-        let robotController;
-        window.addEventListener('load', () => {
-            robotController = new RobotController();
-            // ICE toggle event
-            const iceToggle = document.getElementById('iceToggle');
-            iceToggle.addEventListener('change', function() {
-                if (window.setIceConfig) window.setIceConfig(this.value);
-            });
-        });
-        function startMovement(command, direction) {
-            if (!robotController) return;
-            robotController.sendControlCommand(command, direction);
-            robotController.movementInterval = setInterval(() => {
-                robotController.sendControlCommand(command, direction);
-            }, 50);
-        }
-        function stopMovement() {
-            if (robotController && robotController.movementInterval) {
-                clearInterval(robotController.movementInterval);
-                robotController.movementInterval = null;
-            }
-        }
-    </script>
+    <script src="robot.js"></script>
 </body>
 </html>

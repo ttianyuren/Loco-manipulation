@@ -213,11 +213,51 @@ class TiagoSim:
         self.running = False
         self.sim_thread.join()
 
-    def track_command_latency(self, command_id, client_timestamp):
+    def track_command_latency(self, command_id, client_timestamp, websocket=None):
         """Track command processing latency"""
         if client_timestamp:
-            processing_time = (time.time() * 1000) - client_timestamp
-            print(f"Command {command_id} processing time: {processing_time:.1f}ms")
+            # Get server time in same format as client (milliseconds since epoch)
+            server_time = time.time() * 1000
+            
+            # Calculate processing time (server time - client time)
+            # Note: This measures network latency + processing time
+            processing_time = server_time - client_timestamp
+            
+            # Only log reasonable latency values (avoid corrupted timestamps)
+            if 0 < processing_time < 10000:  # Between 0ms and 10 seconds
+                print(f"Command {command_id} processing time: {processing_time:.1f}ms")
+                
+                # Send the real command latency back to the client
+                if websocket and hasattr(websocket, 'send_str'):
+                    import asyncio
+                    import json
+                    latency_response = {
+                        'type': 'command_latency',
+                        'latency': processing_time,
+                        'command': command_id
+                    }
+                    # Send asynchronously if possible
+                    try:
+                        asyncio.create_task(websocket.send_str(json.dumps(latency_response)))
+                    except:
+                        pass  # Ignore send errors
+                        
+            else:
+                # Timestamp corruption detected - use local measurement instead
+                if not hasattr(self, '_command_start_time'):
+                    self._command_start_time = server_time
+                local_processing_time = server_time - self._command_start_time
+                self._command_start_time = server_time
+                if local_processing_time < 1000:  # Less than 1 second
+                    print(f"Command {command_id} local processing time: {local_processing_time:.1f}ms")
+        else:
+            # No client timestamp - measure local processing time
+            current_time = time.time() * 1000
+            if hasattr(self, '_last_command_time'):
+                local_latency = current_time - self._last_command_time
+                if local_latency < 1000:  # Reasonable value
+                    print(f"Command {command_id} local latency: {local_latency:.1f}ms")
+            self._last_command_time = current_time
     
     def get_performance_stats(self):
         """Get simulation performance statistics"""

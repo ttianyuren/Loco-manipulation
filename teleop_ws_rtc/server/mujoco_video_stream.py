@@ -17,10 +17,12 @@ class MuJoCoVideoStream(VideoStreamTrack):
 
     async def get_ws_frame(self):
         # For WebSocket streaming to <img src="...">
+        import time
         frame_data = self.sim.get_frame_base64()
         mocap_index = self.sim.current_mocap_index
         return {
             'type': 'frame',
             'data': frame_data,
-            'mocap_index': mocap_index
+            'mocap_index': mocap_index,
+            'server_timestamp': time.time() * 1000  # Add server timestamp for latency calculation
         }

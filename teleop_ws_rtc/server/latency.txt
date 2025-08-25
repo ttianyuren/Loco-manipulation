@@ -1,0 +1,19 @@
+1. Ping Latency (WebSocket Round-Trip Time)
+Client sends ping with current timestamp
+Server immediately echoes back the same timestamp
+Client receives pong and calculates: current_time - original_timestamp
+This gives you the total round-trip time for WebSocket communication
+
+2. Command Latency (Control Response Time)
+Client timestamps when control command is sent
+Currently uses a simulated 5ms delay (since server doesn't send acknowledgments)
+In a real system, the server would send back a confirmation message
+This measures how long it takes for control commands to be processed
+
+3. Video Latency (WebRTC Stream)
+Video is transmitted via WebRTC protocol, not WebSocket
+Uses WebRTC's getStats() API to collect real-time statistics
+Measures jitter buffer delay and decode time for actual video latency
+Collects stats every 2 seconds and averages over last 30 measurements
+Shows actual millisecond values when WebRTC connection is established
+Falls back to "WebRTC" text when no measurements available yet

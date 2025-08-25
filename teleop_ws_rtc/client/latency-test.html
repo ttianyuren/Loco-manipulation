@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latency Test Only</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .latency-metrics { 
+            border: 2px solid #007bff; 
+            padding: 15px; 
+            margin: 15px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .latency-metric { 
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 5px 0;
+        }
+        .metric-value { 
+            font-family: 'Courier New', monospace;
+            font-weight: bold; 
+            padding: 2px 6px;
+            border-radius: 3px;
+            background: #e9ecef;
+        }
+        .good { color: #28a745; background: #d4f6dd; }
+        .warning { color: #ffc107; background: #fff8db; }
+        .bad { color: #dc3545; background: #f8d7da; }
+        .connection-status { 
+            padding: 10px; 
+            border-radius: 5px; 
+            margin: 10px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        .connected { background: #d4edda; color: #155724; }
+        .disconnected { background: #f8d7da; color: #721c24; }
+        #log { 
+            border: 1px solid #ccc; 
+            padding: 10px; 
+            height: 200px; 
+            overflow-y: scroll; 
+            font-family: monospace;
+            font-size: 12px;
+            background: #f8f8f8;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Latency Test</h1>
+    
+    <div id="connectionStatus" class="connection-status disconnected">Disconnected</div>
+    
+    <div id="latency-display">
+        <h3>Latency Monitor:</h3>
+        <div class="latency-metrics">
+            <div class="latency-metric">
+                <span class="metric-label">Ping:</span>
+                <span id="ping-latency" class="metric-value">N/A</span>
+            </div>
+            <div class="latency-metric">
+                <span class="metric-label">Video:</span>
+                <span id="video-latency" class="metric-value">N/A</span>
+            </div>
+            <div class="latency-metric">
+                <span class="metric-label">Command:</span>
+                <span id="command-latency" class="metric-value">N/A</span>
+            </div>
+        </div>
+    </div>
+    
+    <button onclick="sendTestCommand()">Send Test Command</button>
+    <button onclick="clearLog()">Clear Log</button>
+    
+    <h3>Debug Log:</h3>
+    <div id="log"></div>
+    
+    <script>
+        let socket = null;
+        let latencies = [];
+        let commandLatencies = [];
+        let logDiv = document.getElementById('log');
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearLog() {
+            logDiv.innerHTML = '';
+        }
+        
+        function connect() {
+            const wsUrl = `ws://${window.location.host}/ws`;
+            log('Connecting to: ' + wsUrl);
+            
+            socket = new WebSocket(wsUrl);
+            
+            socket.onopen = () => {
+                log('✓ WebSocket connected');
+                updateConnectionStatus(true);
+                startPingTest();
+            };
+            
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'pong') {
+                    const latency = performance.now() - data.timestamp;
+                    log(`← Pong received, latency: ${latency.toFixed(1)}ms`);
+                    latencies.push(latency);
+                    if (latencies.length > 20) latencies.shift();
+                    updateLatencyDisplay();
+                } else if (data.type === 'command_latency') {
+                    log(`← Command latency: ${data.latency.toFixed(1)}ms`);
+                    commandLatencies.push(data.latency);
+                    if (commandLatencies.length > 10) commandLatencies.shift();
+                    updateLatencyDisplay();
+                } else {
+                    log(`← Received: ${data.type}`);
+                }
+            };
+            
+            socket.onclose = (event) => {
+                log(`✗ WebSocket closed (${event.code}: ${event.reason})`);
+                updateConnectionStatus(false);
+            };
+            
+            socket.onerror = (error) => {
+                log('✗ WebSocket error: ' + error);
+            };
+        }
+        
+        function updateConnectionStatus(connected) {
+            const status = document.getElementById('connectionStatus');
+            if (connected) {
+                status.textContent = 'Connected';
+                status.className = 'connection-status connected';
+            } else {
+                status.textContent = 'Disconnected';
+                status.className = 'connection-status disconnected';
+            }
+        }
+        
+        function startPingTest() {
+            log('Starting ping test...');
+            let pingCount = 0;
+            
+            setInterval(() => {
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    const timestamp = performance.now();
+                    pingCount++;
+                    socket.send(JSON.stringify({ type: 'ping', timestamp: timestamp }));
+                    log(`→ Ping #${pingCount} sent`);
+                } else {
+                    log('⚠ Cannot send ping - WebSocket not open');
+                }
+            }, 2000); // Every 2 seconds for testing
+        }
+        
+        function sendTestCommand() {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                const command = {
+                    type: 'control',
+                    command: 'move_x',
+                    direction: 1,
+                    client_timestamp: Date.now()
+                };
+                socket.send(JSON.stringify(command));
+                log(`→ Test command sent: move_x +1`);
+            } else {
+                log('⚠ Cannot send command - WebSocket not connected');
+            }
+        }
+        
+        function updateLatencyDisplay() {
+            const avgPing = latencies.length > 0 ? latencies.reduce((a, b) => a + b) / latencies.length : 0;
+            const avgCommand = commandLatencies.length > 0 ? commandLatencies.reduce((a, b) => a + b) / commandLatencies.length : 0;
+            
+            updateLatencyElement('ping-latency', avgPing, [50, 100]);
+            updateLatencyElement('command-latency', avgCommand, [10, 25]);
+            updateLatencyElement('video-latency', 0, [30, 60]); // Placeholder
+        }
+        
+        function updateLatencyElement(elementId, value, thresholds) {
+            const element = document.getElementById(elementId);
+            if (!element) {
+                log(`⚠ Element ${elementId} not found`);
+                return;
+            }
+            
+            const displayValue = value > 0 ? `${value.toFixed(1)}ms` : 'N/A';
+            element.textContent = displayValue;
+            
+            // Apply color coding
+            element.className = 'metric-value';
+            if (value > 0) {
+                if (value < thresholds[0]) {
+                    element.classList.add('good');
+                } else if (value < thresholds[1]) {
+                    element.classList.add('warning');
+                } else {
+                    element.classList.add('bad');
+                }
+            }
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            log('Page loaded, starting connection...');
+            connect();
+        });
+    </script>
+</body>
+</html>
